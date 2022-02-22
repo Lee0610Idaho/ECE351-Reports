@@ -1,0 +1,203 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%					                      %
+% Jackie Lee				              %
+% ECE 351 Section 51			          %
+% Lab 5					                  %
+% Due February 22 2022			          %
+% Latex Code for Lab 5 Report		      %
+% Utilized Template on Canvas		      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% DOCUMENT PREAMBLE %%%
+\documentclass[12pt]{report}
+\usepackage[english]{babel}
+%\usepackage{natbib}
+\usepackage{url}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\graphicspath{{images/}}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{vmargin}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codeblue}{rgb}{0,0,0.95}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{codeblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codegreen},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+ 
+\lstset{style=mystyle}
+
+\setmarginsrb{3 cm}{2.5 cm}{3 cm}{2.5 cm}{1 cm}{1.5 cm}{1 cm}{1.5 cm}
+
+\title{Lab 4: Step and Impulse Response of a RLC Band Pass Filter}								
+% Title
+\author{ Jackie Lee}						
+% Author
+\date{February 22}
+% Date
+
+\makeatletter
+\let\thetitle\@title
+\let\theauthor\@author
+\let\thedate\@date
+\makeatother
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\theauthor}
+\lhead{\thetitle}
+\cfoot{\thepage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{titlepage}
+	\centering
+    \vspace*{0.5 cm}
+   % \includegraphics[scale = 0.075]{bsulogo.png}\\[1.0 cm]	% University Logo
+\begin{center}    \textsc{\Large   ECE 351 - Section 51 }\\[2.0 cm]	\end{center}% University Name
+	\textsc{\Large February 15 2022  }\\[0.5 cm]				% Course Code
+	\rule{\linewidth}{0.2 mm} \\[0.4 cm]
+	{ \huge \bfseries \thetitle}\\
+	\rule{\linewidth}{0.2 mm} \\[1.5 cm]
+	
+	\begin{minipage}{0.4\textwidth}
+		\begin{flushleft} \large
+		%	\emph{Submitted To:}\\
+		%	Name\\
+          % Affiliation\\
+           %contact info\\
+			\end{flushleft}
+			\end{minipage}~
+			\begin{minipage}{0.4\textwidth}
+            
+			\begin{flushright} \large
+			\emph{Submitted By :} \\
+			Jackie Lee  
+		\end{flushright}
+           
+	\end{minipage}\\[2 cm]
+	
+%	\includegraphics[scale = 0.5]{PICMathLogo.png}
+    
+    
+    
+    
+	
+\end{titlepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\tableofcontents
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand{\thesection}{\arabic{section}}
+\section{Introduction}
+ 
+
+In this lab we explore how to use Laplace transform to find the impulse response of an RLC bandpass filter. From there we use Python to plot their calculated impulse response and compare it to the hand calculated value. Lastly, we plot the step response and utilize the final value theorem to determine the value of the output voltage as time approaches infinity. 
+
+\section{Equations}
+
+The Transfer Function:
+\begin{equation*}
+H(s) = \frac{10000s}{s^2 + 10000s +370370370}
+\end{equation*}
+The Impulse Response:
+\begin{equation*}
+h(t) = 10355.66477e^{-5000t}sin(18514t+105\degree)u(t)
+\end{equation*}
+
+
+
+\section{Methodology}
+
+For Part 1, once I was able to determine the transfer function and impulse response as listed in the prelab, it was straightforward to implement and plot in Python. Since I was able to do it before the lab started, I spent most of the lab time trying to create the function that would be able to do it for any RLC bandpass filter but I found that trying to implement the equations was frustrating because of the syntax. I also had solved the prelab by plugging in the values which I found easier to deal with rather than symbolically. I can see why doing it symbolically is more flexible and would involve less numerical calculations but when I was able to get the same plot I was satisfied. Using the impulse function that Python had was given in the lab handout so there wasn't any struggles there. I made sure that the plots were the same before moving on by having them on the same figure. 
+
+
+\begin{lstlisting}[language=Python]
+#%% Code that implemented the impulse response from prelab and Python's calculated impulse response
+steps = 1.2e-5
+t = np.arange(0, 0.0012 , steps)
+
+num = [0, 10000, 0]
+den = [1, 10000, 370370370]
+
+tout, yout = sig.impulse((num, den), T = t) #Python function
+
+#Calculated Impulse Response from Prelab
+Imp = 10355.66477*np.e**(-5000*t)*np.sin(18584*t + 1.8326) #radians
+\end{lstlisting}
+Part 2 required the step response of the transfer function using the built in step function. There wasn't much to base off it was correct but comparing with other students gave me confidence that I used it correctly. The last part was to use the final value theorem which I referenced the textbook and verified with the plot. 
+\begin{lstlisting}[language=Python]
+#%% Code that implemented the step response using Python's built in step function
+tout, yout = sig.step((num, den), T = t)
+\end{lstlisting}
+\section{Results}
+
+Overall, the lab seemed to go well since my plots were able to match. I do believe that if I pulled up the variable explorer and compared my values they wouldn't exactly match because of rounding. The final value theorem and plot of the step response also share the same result. 
+\\ \includegraphics[scale=0.6]{Impulse Response.png}
+
+\\ \includegraphics[scale=0.6]{Step Response.png}
+
+
+Final Value Theorem:
+\begin{equation*}
+ \lim\limits_{s \to 0} (\frac{10000s^2}{s^2+10000s+370370370}) = 0
+\end{equation*}
+
+This matches the result from the impulse response plot as both approach 0 as time goes to "infinity" (milliseconds).
+
+
+
+
+
+\section{Error Analysis}
+
+The difficult part of the lab was trying to solve the prelab symbolically for the impulse response which tied to trying to implement the symbolic function in Python. Since the prelab, didn't specify for the 2nd part to do it symbolically like the 1st part, I plugged in the given values because it was easier for me to deal with. Even with the given functions symbolically, I found that the mix of fractions, exponents, and square roots made it difficult to implement in code at the time. I will definitely have to take some free time in the future to try to implement the whole thing symbolically. 
+
+\section{Questions}
+1. Initially, the circuit has a large variance but eventually settles to 0 as time approaches infinity as described by the theorem. This would mean that initially the components need to have an initial charge that will then be charged and discharged constantly resulting in a stable plot. It would be difficult to show physically because this process happens within milliseconds.
+
+2. So looking at the plots that Python produces, it seems like it would be beneficial if the x axis could be in terms of milliseconds. It's currently correct but it's not as readable otherwise. I should have asked in lab, but was curious on how you would break up the symbolic functions so it could be "easily" be implemented into Python. The worst part was there were exponents within square roots so multiple parenthesis were involved. When I was working my impulse response numerically, if the plots were off I would go back and check that my math for the prelab was correct which involved the plugged in values. 
+
+\section{Conclusion}
+
+By the end of the lab I got more experience developing the transfer function and impulse response of a RLC bandpass filter, utilizing the impulse and step functions of Python, and reviewing the final value theorem and sine method from class. I definitely would have to continue working on getting the symbolic functions implemented into my program but even with just plugged in values and learning how to solve the prelab symbolically from in lab was useful for the future. 
+
+\newpage
+
+
+\begin{thebibliography}{111}
+\bibitem{ACMT}
+Dennis M. Sullivan,
+Signals and Systems for Electrical Engineers I,
+ 2018
+\end{thebibliography}
+\end{document}
