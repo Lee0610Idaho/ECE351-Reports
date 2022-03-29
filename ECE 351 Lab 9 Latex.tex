@@ -1,0 +1,257 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%					                      %
+% Jackie Lee				              %
+% ECE 351 Section 51			          %
+% Lab 9					                  %
+% Due March 29 2022			              %
+% Latex Code for Lab 9 Report		      %
+% Utilized Template on Canvas		      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% DOCUMENT PREAMBLE %%%
+\documentclass[12pt]{report}
+\usepackage[english]{babel}
+%\usepackage{natbib}
+\usepackage{url}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\graphicspath{{images/}}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{vmargin}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codeblue}{rgb}{0,0,0.95}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{codeblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codegreen},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+ 
+\lstset{style=mystyle}
+
+\setmarginsrb{3 cm}{2.5 cm}{3 cm}{2.5 cm}{1 cm}{1.5 cm}{1 cm}{1.5 cm}
+
+\title{Lab 9: Fast Fourier Transform}								
+% Title
+\author{ Jackie Lee}						
+% Author
+\date{March 29}
+% Date
+
+\makeatletter
+\let\thetitle\@title
+\let\theauthor\@author
+\let\thedate\@date
+\makeatother
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\theauthor}
+\lhead{\thetitle}
+\cfoot{\thepage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{titlepage}
+	\centering
+    \vspace*{0.5 cm}
+   % \includegraphics[scale = 0.075]{bsulogo.png}\\[1.0 cm]	% University Logo
+\begin{center}    \textsc{\Large   ECE 351 - Section 51 }\\[2.0 cm]	\end{center}% University Name
+	\textsc{\Large March 29 2022  }\\[0.5 cm]				% Course Code
+	\rule{\linewidth}{0.2 mm} \\[0.4 cm]
+	{ \huge \bfseries \thetitle}\\
+	\rule{\linewidth}{0.2 mm} \\[1.5 cm]
+	
+	\begin{minipage}{0.4\textwidth}
+		\begin{flushleft} \large
+		%	\emph{Submitted To:}\\
+		%	Name\\
+          % Affiliation\\
+           %contact info\\
+			\end{flushleft}
+			\end{minipage}~
+			\begin{minipage}{0.4\textwidth}
+            
+			\begin{flushright} \large
+			\emph{Submitted By :} \\
+			Jackie Lee  
+		\end{flushright}
+           
+	\end{minipage}\\[2 cm]
+	
+%	\includegraphics[scale = 0.5]{PICMathLogo.png}
+    
+    
+    
+    
+	
+\end{titlepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\tableofcontents
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand{\thesection}{\arabic{section}}
+\section{Introduction}
+ 
+
+In this lab we get experience fast Fourier transforms. We were able to use Python to implement and plot fast Fourier transforms with different signals. We were then able to modify the function such that the plots were readable and lastly plot the Fourier transform of signal from the last lab. 
+
+\section{Equations}
+Task 1 - 3 Signals
+\begin{equation*}
+cos(2\pi t)
+\end{equation*}
+
+\begin{equation*}
+5sin(2\pi t)
+\end{equation*}
+
+\begin{equation*}
+2cos((2\pi * 2t) - 2) + sin^2(2\pi * 6t) + 3) 
+\end{equation*}
+Task 5 Signal from Lab 8 
+\begin{equation*}
+x(t) = \sum_{n=1}^{\infty} [\frac{2(1-cos(\pi k))sin(kwt)}{\pi k}]
+\end{equation*}
+
+
+\section{Methodology}
+
+For Task 1 - 3, we were given three different signals. I started off with implementing the given function for fast Fourier transforms in the lab handout. Initially, I was confused on what it meant by incomplete but was able to talk about it with other students and figure out the missing parts. The end result plotted the given signal as well at its magnitude and phase of its Fourier transform. 
+
+Task 4 was straightforward when the solution was given but only required it to be implemented using a for loop and if statement to check the magnitude from its fast Fourier transform. 
+
+Task 5 utilized the code from Lab 8 for the function that was then used in the modified fast Fourier transform function from task 4. 
+
+\begin{lstlisting}[language=Python]
+#%% Code that implemented the fast Fourier transform adding the capability to return the frequency, magnitude, and phase. Sampling frequency fs = 100 is defined separately outside of the function. 
+
+fs = 100
+def fftfunc(x, fs):
+    N = len(x)
+    X_fft = scipy.fftpack.fft(x)
+    X_fft_shifted = scipy.fftpack.fftshift(X_fft)
+    
+    freq = np.arange(-N/2, N/2)*fs/N
+    
+    X_mag = np.abs(X_fft_shifted)/N
+    X_phi = np.angle(X_fft_shifted)
+    return freq, X_mag, X_phi
+
+\end{lstlisting}
+
+\begin{lstlisting}[language=Python]
+#%% Code that was used to plot the results of the Fast Fourier Transform and their original signals resulting in one figure with 5 plots. Used for the different signals presented in this lab. 
+
+fig = plt.figure()
+
+fig1 = plt.subplot2grid((3,2), (0,0), colspan=2, rowspan=1)
+fig1.plot(t,x)
+fig1.title.set_text("Task 1")
+fig1.grid()
+
+fig2 = plt.subplot2grid((3,2), (1,0), colspan=1, rowspan=1)
+fig2.stem(freq, X_mag)
+fig2.grid()
+
+fig3 = plt.subplot2grid((3,2), (1,1), colspan=1, rowspan=1)
+fig3.set_xlim([-2,2])
+fig3.stem(freq, X_mag)
+fig3.grid()
+
+fig4 = plt.subplot2grid((3,2), (2,0), colspan=1, rowspan=1)
+fig4.stem(freq, X_phi)
+fig4.grid()
+
+fig5 = plt.subplot2grid((3,2), (2,1), colspan=1, rowspan=1)
+fig5.stem(freq, X_phi)
+fig5.set_xlim([-2,2])
+fig5.grid()
+
+fig.tight_layout()
+
+\end{lstlisting}
+\section{Results}
+
+The results were similar to the one presented in the handout. I wasn't fully sure if I did everything correctly but I can tell that the transition to Task 4 showed the improvement in readability of the phase plot.
+\\
+Task 1:
+\\ \includegraphics[scale = 0.6 ]{T1.png}
+
+Task 2:
+\\ \includegraphics[scale=0.6]{T2.png}
+\newpage
+
+Task 3:
+\\ \includegraphics[scale=0.6]{T3.png}
+
+Task 4 (Each title corresponds to the signal from their perspective task):
+
+\\ \includegraphics[scale=0.6]{T4A.png}
+
+\\ \includegraphics[scale=0.6]{T4B.png}
+
+\\ \includegraphics[scale=0.6]{T4C.png}
+
+Task 5:
+
+\\ \includegraphics[scale=0.6]{T5.png}
+
+
+
+
+\section{Error Analysis}
+
+The difficult part was getting started with the lab since it seemed like a lot of work. However, after getting the first task done with the initial function and figure. It was a easier to implement the same format with different signals.
+
+\section{Questions}
+1. As fs is decreased, the plots x axis gets smaller resulting in a squished up graph. On the contrary, a higher fs results in a streched out plot due to having bigger ranges for the x axis. 
+
+2. Making the changes to the intiial fast Fourier transform function led to better readability of the graph since it removed most of the "noise" or unnecessary values from the plot.
+
+3. For task 1, we get the Fourier transform as $ \frac{\pi}{2}[\delta (Hz + 1) + \delta (Hz - 1)]$ The locations of the two delta functions matches the plot where the peaks are shared at -1 and 1. For task 2, the resulting transform is $ \frac{5j\pi}{2}[\delta (Hz + 1) - \delta (Hz - 1)]$ which share the same properties as task 1 where the locations of the delta functions and the peaks of their plots are the same. 
+
+4. No feedback, perhaps it would have been easier/less tedious to create a plotting function so that it would take less lines of code but not sure how it would be incorporated with so many subplots.    
+
+
+\section{Conclusion}
+
+By the end of the lab I was able to utilize Python to perform fast Fourier transforms using a user defined function. I have a better understanding of them that would not have come from class. I think at the time of writing this report there are a few minor differences in the plot that I was able to generate compared to the handout but they were close enough to not spend extra time debugging what went wrong/differently.  
+
+\newpage
+
+
+\begin{thebibliography}{111}
+\bibitem{ACMT}
+Dennis M. Sullivan,
+Signals and Systems for Electrical Engineers I,
+ 2018
+\end{thebibliography}
+\end{document}
