@@ -1,0 +1,219 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%					                      %
+% Jackie Lee				              %
+% ECE 351 Section 51			          %
+% Lab 11				                  %
+% Due April 12 2022			              %
+% Latex Code for Lab 11 Report		      %
+% Utilized Template on Canvas		      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% DOCUMENT PREAMBLE %%%
+\documentclass[12pt]{report}
+\usepackage[english]{babel}
+%\usepackage{natbib}
+\usepackage{url}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\graphicspath{{images/}}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{vmargin}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codeblue}{rgb}{0,0,0.95}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{codeblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codegreen},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+ 
+\lstset{style=mystyle}
+
+\setmarginsrb{3 cm}{2.5 cm}{3 cm}{2.5 cm}{1 cm}{1.5 cm}{1 cm}{1.5 cm}
+
+\title{Lab 11: Z - Transform Operations}								
+% Title
+\author{ Jackie Lee}						
+% Author
+\date{April 12}
+% Date
+
+\makeatletter
+\let\thetitle\@title
+\let\theauthor\@author
+\let\thedate\@date
+\makeatother
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\theauthor}
+\lhead{\thetitle}
+\cfoot{\thepage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{titlepage}
+	\centering
+    \vspace*{0.5 cm}
+   % \includegraphics[scale = 0.075]{bsulogo.png}\\[1.0 cm]	% University Logo
+\begin{center}    \textsc{\Large   ECE 351 - Section 51 }\\[2.0 cm]	\end{center}% University Name
+	\textsc{\Large April 12 2022  }\\[0.5 cm]				% Course Code
+	\rule{\linewidth}{0.2 mm} \\[0.4 cm]
+	{ \huge \bfseries \thetitle}\\
+	\rule{\linewidth}{0.2 mm} \\[1.5 cm]
+	
+	\begin{minipage}{0.4\textwidth}
+		\begin{flushleft} \large
+		%	\emph{Submitted To:}\\
+		%	Name\\
+          % Affiliation\\
+           %contact info\\
+			\end{flushleft}
+			\end{minipage}~
+			\begin{minipage}{0.4\textwidth}
+            
+			\begin{flushright} \large
+			\emph{Submitted By :} \\
+			Jackie Lee  
+		\end{flushright}
+           
+	\end{minipage}\\[2 cm]
+	
+%	\includegraphics[scale = 0.5]{PICMathLogo.png}
+    
+    
+    
+    
+	
+\end{titlepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\tableofcontents
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand{\thesection}{\arabic{section}}
+\section{Introduction}
+ 
+
+In this lab we get experience with z transforms using Python to analyze a discrete system.
+
+\section{Equations}
+Starting Casual Function
+\begin{equation*}
+H(z) = \frac{2z(z-20)}{(z-2)(z-8)}
+\end{equation*}
+
+Transfer Function in z domain
+\begin{equation*}
+H(z) = \frac{2z(z-20)}{(z-2)(z-8)}
+\end{equation*}
+
+Transfer Function in k domain
+\begin{equation*}
+H(k) = -4(8^k)u[k] + 6(2^k)u[k]
+\end{equation*}
+
+
+
+\section{Methodology}
+
+To get the transfer function we performed the z transformation of both sides of the casual function, separated the x and y terms, and lastly solved for Y(z)/X(z). This results in the equation
+
+\begin{equation*}
+H(z) = \frac{2(1-20z^-1 )}{(1-8z^-1) (1-2z^-1 )}
+\end{equation*}
+
+We want to remove the negative exponents so multiply the top and bottom by z squared to get the transfer function listed in section 2. 
+\begin{equation*}
+H(z) = \frac{2z(z-20)}{(z-2)(z-8)}
+\end{equation*}
+
+We start partial fraction expansion by dividing out a z initially that will be used at the end to perform reverse z transform. Resulting in the setup
+\begin{equation*}
+    \frac{H(z)}{z} = \frac{2(z-20)}{(z-2)(z-8)} = \frac{A}{z-8} + \frac{B}{z-2}
+\end{equation*}
+
+Performing partial fraction expansion by solving for A and B separately we get that A = -4 and B = 6. Plugging them back to the previous equation and multiplying the z back from the LHS results in.
+
+\begin{equation*}
+    H(z) = \frac{4z}{z-8} + \frac{6z}{z-2}
+\end{equation*}
+
+Performing the inverse z transform of this equation results in the final answer
+\begin{equation*}
+    H(k) = -4(8^k)u[k] + 6(2^k)u[k]
+\end{equation*}
+
+In terms of the code, there wasn't much to implement since the zplane function was given. The main part was setting up the numerator and denominator of the transfer function. After that, it was utilizing the functions. 
+
+\section{Results}
+
+The results from sig.residuez() matched the results from the manual partial fraction expansion. The resulting zplane also matched the transfer function that was found in terms of the zeros and poles. It's unclear what plot was expected from freqz but without any errors it seemed reasonable. 
+
+
+Hand calculated Phase and Magnitude:
+\\ \includegraphics[scale = 2.6 ]{Partial Fraction Results.png}
+
+
+Python's Z plane:
+\\ \includegraphics[scale=0.6]{zplane.png}
+\newpage
+Magnitude and Phase:
+\\ \includegraphics[scale=0.6]{freqz.png}
+
+
+
+
+\section{Error Analysis}
+
+There wasn't a particularly difficult part for this lab, there was some confusion with the phase and magnitude plot in terms of what the x and y axis should be in. However, it wouldn't take much effort to change the units if necessary. I found for documentation for freqz that the default w value is in rad/sample which I chose to use in my plot. 
+
+\section{Questions}
+1. By looking at the plot of zplane, the system is unstable because the poles lie outside of the "circle" drawn by the zplane function. This is further indicated by looking at the plots from task 5 where they do not approach 0 for increasing x values.  
+
+2. I did notice that part of the zplane function was commented out for setting the ticks, perhaps putting a note why that is would be nice for the curious. Other than that, example plot for freqz would have clarified xaxis/yaxis units even if the function was different. 
+\newpage
+
+\section{Conclusion}
+
+By the end of the lab I was able to utilize Python to refresh verifying partial fraction expansions and to generate the z plane of a transfer function to verify the poles, zeros, and stability of the function. Plotting the magnitude and phase of the function provided further information that the function was unstable. 
+\newpage
+
+
+\begin{thebibliography}{111}
+\bibitem{ACMT}
+Christopher Felton,
+Zplane function in Python,
+2011
+\bibitem{ACMT}
+Dennis M. Sullivan,
+Signals and Systems for Electrical Engineers I,
+ 2018
+\end{thebibliography}
+\end{document}
