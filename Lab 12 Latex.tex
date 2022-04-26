@@ -1,0 +1,260 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%					                      %
+% Jackie Lee				              %
+% ECE 351 Section 51			          %
+% Lab 12				                  %
+% Due April 26 2022			              %
+% Latex Code for Lab 12 Report		      %
+% Utilized Template on Canvas		      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% DOCUMENT PREAMBLE %%%
+\documentclass[12pt]{report}
+\usepackage[english]{babel}
+%\usepackage{natbib}
+\usepackage{url}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\graphicspath{{images/}}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\usepackage{vmargin}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codeblue}{rgb}{0,0,0.95}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{codeblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codegreen},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+ 
+\lstset{style=mystyle}
+
+\setmarginsrb{3 cm}{2.5 cm}{3 cm}{2.5 cm}{1 cm}{1.5 cm}{1 cm}{1.5 cm}
+
+\title{Lab 12 - Final Project: Filter Design}								
+% Title
+\author{ Jackie Lee}						
+% Author
+\date{April 26 2022}
+% Date
+
+\makeatletter
+\let\thetitle\@title
+\let\theauthor\@author
+\let\thedate\@date
+\makeatother
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\theauthor}
+\lhead{\thetitle}
+\cfoot{\thepage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{titlepage}
+	\centering
+    \vspace*{0.5 cm}
+   % \includegraphics[scale = 0.075]{bsulogo.png}\\[1.0 cm]	% University Logo
+\begin{center}    \textsc{\Large   ECE 351 - Section 51 }\\[2.0 cm]	\end{center}% University Name
+	\textsc{\Large April 26 2022  }\\[0.5 cm]				% Course Code
+	\rule{\linewidth}{0.2 mm} \\[0.4 cm]
+	{ \huge \bfseries \thetitle}\\
+	\rule{\linewidth}{0.2 mm} \\[1.5 cm]
+	
+	\begin{minipage}{0.4\textwidth}
+		\begin{flushleft} \large
+		%	\emph{Submitted To:}\\
+		%	Name\\
+          % Affiliation\\
+           %contact info\\
+			\end{flushleft}
+			\end{minipage}~
+			\begin{minipage}{0.4\textwidth}
+            
+			\begin{flushright} \large
+			\emph{Submitted By :} \\
+			Jackie Lee  
+		\end{flushright}
+           
+	\end{minipage}\\[2 cm]
+	
+%	\includegraphics[scale = 0.5]{PICMathLogo.png}
+    
+    
+    
+    
+	
+\end{titlepage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\tableofcontents
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand{\thesection}{\arabic{section}}
+\section{Introduction}
+ 
+
+In this lab we utilize our experience with Python and ECE 350 concepts this semester to design a filter that removes unwanted noise of a given input signal. We are given the range of frequencies where the information is located and are expected to design a filter and verify its capabilities through Python. 
+
+\section{Equations}
+Transfer Function of Series RLC Bandpass Filter
+\begin{equation*}
+H(s) = \frac{s\frac{R}{L}}{s^2+s\frac{R}{L}+\frac{1}{LC}}
+\end{equation*}
+
+Bandwidth 
+\begin{equation*}
+BW = \frac{R}{L} = rad/s
+\end{equation*}
+
+
+Center Frequency
+\begin{equation*}
+w_o^2 = \frac{1}{LC} = rad/s
+\end{equation*}
+
+
+
+\section{Methodology}
+
+To get started, the input signal was read using the provided code. From this, the noise is preventing the position measurement information from being readable so it needs a filter. A band-pass filter is necessary because there is an upper limit and lower limit frequency therefore only using a low-pass or a high-pass filter won't suffice. 
+
+I needed a refresher on band-pass filters so I went with a simple series RLC band-pass filter. I chose 1000 mH for the inductor because when I researched standard values of components, inductors were the most expensive so I went with its standard first and solved for R and C. I was able to solve for R using the bandwidth equation. This left only C which I used the center frequency equation, however when I initially went with 1900 Hz as the center frequency it did not lead to a cleaner output signal but using 200 Hz which happened to be the bandwidth, lead to the better signal. This lead me to believe either the equation was wrong or I failed to recall what the center frequency should be. My final circuit resulted in:
+
+\includegraphics[scale = 1.0]{Final Project Circuit.png}
+
+By using the bilinear and lfilter functions with the transfer function of the filter, an output signal can be plotted. 
+\begin{lstlisting}[language=Python]
+#%% Code that implemented the transfer function of the filter and generated the output signal from the filter
+#Transfer Function in Symbolic Form#
+num = [R/L, 0]
+den = [1, R/L, 1/(L*C)]
+
+#Filtered output#
+z, p = sig.bilinear(num, den, 100000) #Up to 100k
+
+outputSignal = sig.lfilter(z, p, sensor_sig)
+
+
+\end{lstlisting}
+
+I carried over the fast Fourier transform function from an earlier lab so that it can be used with the output signal and be plotted. 
+\begin{lstlisting}[language=Python]
+#%% Code that implemented fast Fourier transfrom
+def fftfunc(x, fs):
+    N = len(x)
+    X_fft = scipy.fftpack.fft(x)
+    X_fft_shifted = scipy.fftpack.fftshift(X_fft)
+    
+    freq = np.arange(-N/2, N/2)*fs/N
+    
+    X_mag = np.abs(X_fft_shifted)/N
+    X_phi = np.angle(X_fft_shifted)
+    return freq, X_mag, X_phi
+\end{lstlisting}
+
+Bode plots were implemented using the bode function to generate values in dB and semilogX to set the x axis.
+\begin{lstlisting}[language=Python]
+#%% Code that demonstrates using the bode function and plotting a bode plot
+sys = sig.TransferFunction(num,den) #Transfer Function implemented to be used with bode
+w2, mag2, phase2 = sig.bode(sys, hz) #Generate the corresponding values for the Bode Plot
+
+fig, ax = plt.subplots(2)
+fig.suptitle("Bode Plot of the Whole Signal in Hz")
+plt.tight_layout()
+ax[0].semilogx(hz, mag2)
+ax[0].set_ylabel("Decibel (dB)")
+ax[0].set_title("magnitude")
+ax[0].grid()
+\end{lstlisting}
+
+I was able to utilize the reference code for stem plotting in the handout to plot the fast Fourier transforms of the output signal. Up to this point I was able to generate the corresponding bode plots and filtered output signals. Lastly, I analyzed these plots to make sure that it fit the expectations of the filter based on the handout and what I expected a clean signal to look like. 
+
+\section{Results}
+
+Input Signal:
+\\ \includegraphics[scale = .5 ]{Noisy.png}
+\newpage
+Filtered Input Signal:
+\\ \includegraphics[scale= .5]{Clean.png}
+\\ Between the two, the new plot is more readable and we can tell from the shape of both plots that they share the same function but now it removes the excess noise from the first plot which was indicated to be the switching amplifier and the Vibration noise. 
+
+Bode Plots:
+\\ \includegraphics[scale=0.6]{Bode Plot Filter.png}
+\\ This plot shows the attenuation of the signals through all the frequencies. It matches expectation in that at the peak around 2000 Hz that it's dB is around 0 whereas the other values are attenuated.
+
+\\ \includegraphics[scale=0.6]{Bode Info.png} 
+\\ Here we show the specifically the attenuation for the information that would like to be unchanged which is supported that from 1800 to 2000 Hz, the dB is around 0. 
+
+\\ \includegraphics[scale =  0.6]{Bode Low Noise.png}
+\\ In this plot, we show that the low frequency vibration noise gets cancelled out by the filter since the dB gets lower as the frequency decreases past 1800 Hz. 
+
+\\ \includegraphics[scale = 0.6 ]{Bode High Noise.png}
+\\ Similar to the last plot, this shows that for increasing frequencies past 2000 Hz, the dB decreases which will effectively remove the switch amplifier noise from the input signal. 
+
+FFT Plots:
+\\
+\ \includegraphics[scale = 0.4]{FFT Output Unfilterd.png}
+\ \includegraphics[scale = 0.4]{FFT Output Filtered.png} 
+\\ Similar to its respective Bode plot, the filtered plot shows that the small range of 200 Hz of the information is wanted to be kept is non attenuated compared to its noise counterparts where they are effectively filtered out. This is further supported by looking  at its unfiltered plot where values outside of 1800 t0 2000 Hz range show noticeable values with a peak magnitude around .9. 
+
+\ \includegraphics[scale = 0.4]{FFT Info Unfiltered.png}
+\ \includegraphics[scale = 0.4]{FFT Info Filterd.png}
+\\ This shows that the information that was wanted from 1800 to 2000 Hz is unchanged when the input signal goes through the filter as the difference between the two plots is unnoticeable.
+
+\ \includegraphics[scale = 0.4]{FFT Low Noise Unfiltered.png}
+\ \includegraphics[scale = 0.4]{FFT Low Noise Filtered.png}
+\\ When comparing the two there is a noticeable low frequency noise spike below 200 Hz in the unfiltered plot where it has been removed in the filtered plot. This leads to the conclusion that the indicated low frequency noise is around 70 Hz with a magnitude of about .75 V.
+
+\ \includegraphics[scale = 0.4]{FFT High Noise Unfiltered.png}
+\ \includegraphics[scale = 0.4]{FFT High Nooise Filtered.png}
+\\ Similar to the low frequency noise from the last set of plots, we can tell that the Switching Amplifier Noise has noticeable spikes above .5V around 50000 Hz, these along with the smaller ones are attenuated in the filtered plot. This leads to the conclusion that the magnitude and frequency of the Switching Amplifier Noise specified in the handout is .5V at 50000 Hz. 
+
+
+\section{Error Analysis}
+
+I'd say the biggest problem that I had for this one was that the center frequency equation I used to find C didn't seem to go as expected. I also got confused between rad/s and Hz with the equations but since I was able to plot the signals and verify its attenuations around the specified frequencies, I was able to find a reasonable output due to the filter.  
+
+\section{Questions}
+1. I'd say I accomplished what I wanted in this course, I first time experience with Python and feel more comfortable with it. I can't say all of this is transferable to CS courses with Python since it did involve ECE 350 concepts but it made me comfortable with the language. Plus as an added bonus I was able to create Latex Documents and organize my work through Github. 
+\newpage
+
+\section{Conclusion}
+
+By the end of the lab I was able to utilize Python and my knowledge from my ECE courses to design a filter that would filter out unwanted noise from a signal. In this case it was the low frequency noise and the switching amplifier noise. This would result in only passing in the Position Measurement Information from the signal between 1800-2000 Hz. This experience and verification method could be implemented in different scenarios involving different frequencies.
+\newpage
+
+
+\begin{thebibliography}{111}
+Dennis M. Sullivan,
+Signals and Systems for Electrical Engineers I,
+ 2018
+\end{thebibliography}
+\end{document}
